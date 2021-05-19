@@ -1,23 +1,44 @@
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useContext, useEffect} from 'react'
 import {useDropzone} from 'react-dropzone'
+import api from '../api';
+import { AllContext } from '../context'
 
 function MyDropzone() {
 
-    const [files, setFiles] = useState([]);
+    const {
+        state,
+        dispatch
+    } = useContext(AllContext);
 
   const onDrop = useCallback(acceptedFiles => {
-    setFiles(acceptedFiles.map((item)=>{
-        return {
-            file:item,
-            preview:URL.createObjectURL(item),
-        }
-    }))
-  }, [])
+    dispatch({
+        type:"setFiles",
+        payload:acceptedFiles.map((item)=>{
+            return {
+                file:item,
+                preview:URL.createObjectURL(item),
+            }
+        })
+    })
+   
+  }, [dispatch])
+  
+  useEffect(()=>{
+      if (state.files !== []) {
+          state.files.forEach((item)=>{
+              handleUpload(item)
+          })
+      }
+  },[state.files])
+
+  const handleUpload = (file) => {
+    const data = new FormData();
+    data.append('file',file.file)
+    api.post('/images',data)
+  }
+
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
 
-  useEffect(()=>{
-      console.log(files);
-  },[files])
 
   return (
     <div 
