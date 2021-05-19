@@ -1,7 +1,9 @@
+import MyDropzone from "./components/upload";
+
 function App() {
   return (
     <div>
-      starting
+      <MyDropzone/>
     </div>
   );
 }
